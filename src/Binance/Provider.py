@@ -2,6 +2,7 @@
 
 import requests
 import json
+from Utils import *
 
 Base_url = "https://api.binance.com/"
 Ping = "api/v1/ping"
@@ -11,25 +12,25 @@ All_Prices = "api/v1/ticker/allPrices"
 
 def ping():
     url = Base_url + Ping
-    print "Calling " + url
+    print_info("Calling " + url)
     response = requests.get(url)
-    print response
-    print "\n"
+    print_info(response)
 
-def get_time():
+def get_server_time():
     url = Base_url + Time
-    print "Calling " + url
+    print_info("Calling " + url)
     response = requests.get(url)
-    print response
-    print response.content
-    print "\n"
+    print_info(response)
+    print_info(response.content)
+    serverTIme = json.loads(response.content)
+    return serverTIme["serverTime"]
 
 def get_klines(symbol, interval):
     url = "{0}{1}?symbol={2}&interval={3}".format(Base_url, Klines, symbol, interval)
-    print "Calling " + url
+    print_info("Calling " + url)
     response = requests.get(url)
-    print response
-    print "\n"
+    print_info(response)
+
     content = response.content
     _klines = json.loads(content)
     well_lines = []
@@ -49,11 +50,11 @@ def get_all_symbols():
 
 def get_all_prices():
     url = Base_url + All_Prices
-    print "Calling " + url
+    print_info("Calling " + url)
     response = requests.get(url)
-    print response
+    print_info(response)
     content = response.content
-    print content
+    print_info(content)
     return json.loads(content)
 
 class Line(object):
@@ -76,21 +77,79 @@ class Line(object):
 # ]
 # '''
     def __init__(self, data):
-        self.open_time = data[0]
-        self.open = data[1]
-        self.high = data[2]
-        self.low = data[3]
-        self.close = data[4]
-        self.volume = float(data[5])
-        self.close_time = data[6]
-        self.quote_asset_volume = data[7]
-        self.number_of_trades = data[8]
-        self.taker_buy_base_asset_volume = data[9]
-        self.taker_buy_quote_assert_volume = data[10]
-        self.can_be_ignored = data[11]
+        self._open_time = data[0]
+        self._open = data[1]
+        self._high = data[2]
+        self._low = data[3]
+        self._close = float(data[4])
+        self._volume = float(data[5])
+        self._close_time = data[6]
+        self._quote_asset_volume = data[7]
+        self._number_of_trades = data[8]
+        self._taker_buy_base_asset_volume = data[9]
+        self._taker_buy_quote_assert_volume = data[10]
+        self._can_be_ignored = data[11]
 
-    def get_volume(self):
-        return self.volume
+    @property
+    def open_time(self):
+        return self._open
+
+    @property
+    def open(self):
+        return self._open
+
+    @property
+    def high(self):
+        return self._high
+
+    @high.setter
+    def high(self, value):
+        self._high = value
+
+    @property
+    def low(self):
+        return self._low
+
+    @low.setter
+    def low(self, val):
+        self._low = val
+
+    @property
+    def close(self):
+        return self._close
+
+    @close.setter
+    def close(self, val):
+        self._close = val
+
+    @property
+    def close_time(self):
+        return self._close_time
+
+    @property
+    def quote_asset_volume(self):
+        return self._quote_asset_volume
+
+    @property
+    def volume(self):
+        return self._volume
+
+    @property
+    def number_of_trades(self):
+        return self._number_of_trades
+
+    @property
+    def taker_buy_base_asset_volume(self):
+        return self._taker_buy_base_asset_volume
+
+
+    @property
+    def taker_buy_quote_assert_volume(self):
+        return self._taker_buy_quote_assert_volume
+
+    @property
+    def can_be_ignored(self):
+        return self._can_be_ignored
 
 #
 # ping()
