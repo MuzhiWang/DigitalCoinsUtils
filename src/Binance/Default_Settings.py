@@ -1,0 +1,8 @@
+
+# Set None as no print. 1 as print out debug info.
+DEBUG = None
+DEFAULT_LINE_INTERVAL = "1m"
+DEFAULT_PRICE_INCREASE_RATE_THRESHOLD = -0.01
+DEFAULT_VOLUME_INCREASE_RATE_THRESHOLD = 0.05
+# this is second.
+SCAN_EACH_SYMBOL_DELAY = 0

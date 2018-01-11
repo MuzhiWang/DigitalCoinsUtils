@@ -1,9 +1,7 @@
 #!/usr/bin/python
 
 from time import *
-
-# Set None as no print. 1 as print out debug info.
-DEBUG = 1
+from Default_Settings import *
 
 def get_time_span_seconds(time1, time2):
     pass
@@ -21,7 +19,10 @@ def get_current_epoch():
 def get_float_to_100_percent(f):
     return "{0} %".format((float(f) * 100))
 
-def print_info(info):
-    if DEBUG:
+def print_info(info, always_display = None):
+    if DEBUG or always_display:
         print info
         print "\n"
+
+def print_error(error):
+    print_info(error, 1)

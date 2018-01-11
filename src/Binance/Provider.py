@@ -43,9 +43,11 @@ def get_all_symbols():
     all_prices = get_all_prices()
     all_symbols = []
     for price in all_prices:
-        # print price['symbol']
-        all_symbols.append(price['symbol'])
-    # print "\n"
+        # Skip the "123456" since it will case float division by zero error for all points since it is testing symbol with all zero data.
+        # Also skip "ETH" and "BNB" as compared symbol. We just need "BTC"
+        symbol = str(price['symbol'])
+        if symbol[-3:] == "BTC":
+            all_symbols.append(symbol)
     return all_symbols
 
 def get_all_prices():
