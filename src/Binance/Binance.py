@@ -171,7 +171,7 @@ class Client_Settings(object):
 # print str(tt)
 
 
-check_all_symbols("2m")
+# check_all_symbols("2m")
 
 # ttt = "abcdef"
 # print ttt[-3:]

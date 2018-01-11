@@ -162,4 +162,6 @@ class Line(object):
 # print t.__getitem__(0).volume
 # get_all_prices()
 
-# get_all_symbols()
+data = get_all_symbols()
+print data
+write_data(data)

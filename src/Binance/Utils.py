@@ -2,6 +2,7 @@
 
 from time import *
 from Default_Settings import *
+import datetime
 
 def get_time_span_seconds(time1, time2):
     pass
@@ -18,6 +19,10 @@ def get_current_epoch():
 
 def get_float_to_100_percent(f):
     return "{0} %".format((float(f) * 100))
+
+def write_data(data):
+    with open('./Data/dateInfo.txt', 'a') as outFile:
+        outFile.write('\n' + str(datetime.datetime.utcnow()) + '  ' + str(data))
 
 def print_info(info, always_display = None):
     if DEBUG or always_display:
