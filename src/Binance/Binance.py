@@ -5,7 +5,7 @@ from Utils import *
 from Default_Settings import *
 import time
 
-def get_compare_info(symbol, interval):
+def get_compare_info(symbol, interval, current_mill):
 
     print_info("This is get compare info, the symbol is: {0}".format(symbol))
 
@@ -13,20 +13,17 @@ def get_compare_info(symbol, interval):
         pass
 
     klines = list(get_klines(symbol, DEFAULT_LINE_INTERVAL))
-    current_mill = get_server_time()
     interval_mill = convert_minute_to_millisec(interval)
     latest_line = klines[-1]
 
-    # print current_mill
-    # print interval_mill
-    # print latest_line.close_time
-    # print "current mill above \n"
+    print_info("interval mill is:" + str(interval_mill))
+    print_info("lastest line close price is {0}, volume is {1}".format(latest_line.close, latest_line.volume))
 
     zero_point = None
     for line in reversed(klines):
         if (current_mill - line.close_time) > interval_mill:
             # Skip if the zero point happened before.
-            if int(line.volume) == 0 or int(line.close) == 0:
+            if line.volume < 0.1 or line.close < 0.000000001:
                 if zero_point is not None:
                     continue
 
@@ -51,14 +48,21 @@ def get_compare_info(symbol, interval):
                 return compare_info
             except ZeroDivisionError, e:
                 zero_point = 1
-                print_error("Error occurred in symbol: {0}. ".format(symbol) + str(e))
+                # print_error("Error occurred in symbol: {0}. ".format(symbol) + str(e))
 
 
 def check_all_symbols(interval):
+    print_info("Start to check all symbols price and volume changes...", 1)
     symbols = get_all_symbols()
+    current_mill = get_server_time()
+    print_info("Current mill is: {0}".format(current_mill))
+
+    count = 0
     for symbol in symbols:
+        if count < 0:
+            break
         print_info("This is check all symbols, the symbol is: {0}".format(symbol))
-        compare_info = get_compare_info(symbol, interval)
+        compare_info = get_compare_info(symbol, interval, current_mill)
         if compare_info is None:
             print_error("Empty compared info for symbol: {0}".format(symbol))
             continue
@@ -66,11 +70,12 @@ def check_all_symbols(interval):
         print_info("{0} volume diff is: {1}".format(symbol, str(compare_info.diff_volume)))
         compare_info_alert(compare_info)
         time.sleep(SCAN_EACH_SYMBOL_DELAY)
+        count += 1
 
 def compare_info_alert(compare_info, client_settings = None):
     print_info("This is compare info alert, the symbol is: {0}".format(compare_info.symbol))
+    print_info(compare_info.price_increase_rate)
 
-    compare_info = Compare_Info(compare_info)
     if client_settings is None:
         client_settings = Client_Settings()
 
@@ -105,7 +110,7 @@ class Compare_Info(object):
 
     @diff_volume.setter
     def diff_volume(self, value):
-        self._diff_volume = value
+        self._diff_volume = float(value)
 
     @property
     def volume_increase_rate(self):
@@ -113,7 +118,7 @@ class Compare_Info(object):
 
     @volume_increase_rate.setter
     def volume_increase_rate(self, value):
-        self._volume_increase_rate = value
+        self._volume_increase_rate = float(value)
 
     @property
     def diff_price(self):
@@ -121,7 +126,7 @@ class Compare_Info(object):
 
     @diff_price.setter
     def diff_price(self, value):
-        self._diff_price = value
+        self._diff_price = float(value)
 
     @property
     def price_increase_rate(self):
@@ -129,7 +134,7 @@ class Compare_Info(object):
 
     @price_increase_rate.setter
     def price_increase_rate(self, val):
-        self._price_increase_rate = val
+        self._price_increase_rate = float(val)
 
 
 # Client settings class override the default settings to check compare results, which will trigger alerts.
@@ -166,7 +171,10 @@ class Client_Settings(object):
 # print str(tt)
 
 
-check_all_symbols("15m")
+check_all_symbols("2m")
 
 # ttt = "abcdef"
 # print ttt[-3:]
+
+# t = get_server_time()
+# tt = get_compare_info("EVXBTC", "2m", t)
