@@ -20,7 +20,16 @@ def main(argv):
           interval = arg
    print 'The interval is ', interval
 
-   check_all_symbols(interval)
+   run_cron_job(interval)
+
+def run_cron_job(interval):
+   while 1:
+      try:
+         check_all_symbols(interval)
+         time.sleep(CRON_JOB_TIME)
+      except:
+         print_error("Error happened in Cron job, retry...")
+
 
 if __name__ == "__main__":
    main(sys.argv[1:])

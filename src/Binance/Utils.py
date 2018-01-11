@@ -3,12 +3,18 @@
 from time import *
 from Default_Settings import *
 import datetime
+from time import *
 
 def get_time_span_seconds(time1, time2):
     pass
 
 def get_time_span_minutes(time1, time2):
     pass
+
+def get_current_time(gmt_time = None):
+    if gmt_time:
+        return strftime("%Y-%m-%d  %H:%M:%S", gmt_time())
+    return strftime("%Y-%m-%d  %H:%M:%S")
 
 def convert_minute_to_millisec(interval):
     minute = int(interval.strip('m'))

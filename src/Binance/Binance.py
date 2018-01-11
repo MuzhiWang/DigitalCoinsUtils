@@ -41,6 +41,8 @@ def get_compare_info(symbol, interval, current_mill):
                 price_increase_rate = float(format((compare_info.diff_price / line.close), '.4f'))
                 compare_info.price_increase_rate = price_increase_rate
 
+                compare_info.price = latest_line.close
+
                 print_info("latest vol: " + str(latest_line.volume))
                 print_info("target vol: " + str(line.volume))
                 print_info("latest price: " + str(latest_line.close))
@@ -72,6 +74,8 @@ def check_all_symbols(interval):
         time.sleep(SCAN_EACH_SYMBOL_DELAY)
         count += 1
 
+    print_info("The check all symbols completed.", 1)
+
 def compare_info_alert(compare_info, client_settings = None):
     print_info("This is compare info alert, the symbol is: {0}".format(compare_info.symbol))
     print_info(compare_info.price_increase_rate)
@@ -81,9 +85,11 @@ def compare_info_alert(compare_info, client_settings = None):
 
     if compare_info.price_increase_rate > client_settings.price_increase_rate_threshold:
         if compare_info.volume_increase_rate > client_settings.volume_increase_rate_threshold:
-            print_info("The {0} is increasing dramatically. ".format(compare_info.symbol), 1)
+            print_info("The {0} is increasing dramatically around: {1}. ".format(compare_info.symbol, get_current_time()), 1)
+            print_info("The price at checking time is: {0}".format(compare_info.price), 1)
             print_info("The price increase rate is: {0}".format(get_float_to_100_percent(compare_info.price_increase_rate)), 1)
             print_info("The volume increase rate is: {0}".format(get_float_to_100_percent(compare_info.volume_increase_rate)), 1)
+            print_info("*********************** GOOD LUCK! ************************", 1)
 
 
 # Compare info class represents the difference we want to check from target Line value.
@@ -91,6 +97,7 @@ class Compare_Info(object):
 
     def __init__(self, symbol):
         self._symbol = symbol
+        self._price = None
         self._diff_volume = None
         self._volume_increase_rate = None
         self._diff_price = None
@@ -103,6 +110,14 @@ class Compare_Info(object):
     @symbol.setter
     def symbol(self, val):
         self._symbol = val
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, val):
+        self._price = val
 
     @property
     def diff_volume(self):

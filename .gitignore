@@ -102,3 +102,6 @@ ENV/
 
 # local PyCharm
 src/.idea/
+
+# test data
+src/Binance/Data/
