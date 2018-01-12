@@ -27,6 +27,8 @@ def run_cron_job(interval):
       try:
          check_all_symbols(interval)
          time.sleep(CRON_JOB_TIME)
+      except KeyboardInterrupt:
+         raise
       except:
          print_error("Error happened in Cron job, retry...")
 

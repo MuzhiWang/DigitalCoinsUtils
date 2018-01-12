@@ -20,8 +20,9 @@ def get_compare_info(symbol, interval, current_mill):
     print_info("lastest line close price is {0}, volume is {1}".format(latest_line.close, latest_line.volume))
 
     zero_point = None
-    for line in reversed(klines):
-        if (current_mill - line.close_time) > interval_mill:
+    for line in reversed(klines[:-1]):
+        # If the interval is set as min 1 min, directly check the value nearest to the latest one.
+        if (current_mill - line.close_time) > interval_mill or interval_mill == 6000:
             # Skip if the zero point happened before.
             if line.volume < 0.1 or line.close < 0.000000001:
                 if zero_point is not None:
@@ -54,6 +55,7 @@ def get_compare_info(symbol, interval, current_mill):
 
 
 def check_all_symbols(interval):
+    print_info("----------------------- Start check -----------------------", 1)
     print_info("Start to check all symbols price and volume changes...", 1)
     symbols = get_all_symbols()
     current_mill = get_server_time()
@@ -190,6 +192,7 @@ class Client_Settings(object):
 
 # ttt = "abcdef"
 # print ttt[-3:]
+# print ttt[:-1]
 
 # t = get_server_time()
 # tt = get_compare_info("EVXBTC", "2m", t)
