@@ -55,9 +55,14 @@ def get_compare_info(symbol, interval, current_mill):
 
 
 def check_all_symbols(interval):
-    print_info("----------------------- Start check -----------------------", 1)
-    print_info("Start to check all symbols price and volume changes...", 1)
     symbols = get_all_symbols()
+    check_symbols(symbols, interval)
+
+def check_symbols(symbols, interval):
+    print_info("----------------------- Start check -----------------------")
+    print_info("Start to check all symbols price and volume changes...")
+    print_info("Current symbols: {0}".format(symbols))
+
     current_mill = get_server_time()
     print_info("Current mill is: {0}".format(current_mill))
 
@@ -76,7 +81,7 @@ def check_all_symbols(interval):
         time.sleep(SCAN_EACH_SYMBOL_DELAY)
         count += 1
 
-    print_info("The check all symbols completed.", 1)
+    print_info("The check all symbols completed.")
 
 def compare_info_alert(compare_info, client_settings = None):
     print_info("This is compare info alert, the symbol is: {0}".format(compare_info.symbol))
@@ -193,6 +198,7 @@ class Client_Settings(object):
 # ttt = "abcdef"
 # print ttt[-3:]
 # print ttt[:-1]
+# print ttt[1:]
 
 # t = get_server_time()
 # tt = get_compare_info("EVXBTC", "2m", t)
