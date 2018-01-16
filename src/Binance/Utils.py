@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from time import *
 from Default_Settings import *
 import datetime
 from time import *
@@ -12,9 +11,17 @@ def get_time_span_minutes(time1, time2):
     pass
 
 def get_current_time(gmt_time = None):
+    time_format = "%Y-%m-%d  %H:%M:%S"
     if gmt_time:
-        return strftime("%Y-%m-%d  %H:%M:%S", gmt_time())
-    return strftime("%Y-%m-%d  %H:%M:%S")
+        return strftime(time_format, gmt_time())
+    return strftime(time_format)
+
+def get_current_date(gmt_time = None):
+    date_format = "%Y-%m-%d"
+    if gmt_time:
+        return strftime(date_format, gmt_time())
+    return strftime(date_format)
+
 
 def convert_minute_to_millisec(interval):
     minute = int(interval.strip('m'))

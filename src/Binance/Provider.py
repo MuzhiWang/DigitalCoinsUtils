@@ -25,8 +25,11 @@ def get_server_time():
     serverTIme = json.loads(response.content)
     return serverTIme["serverTime"]
 
-def get_klines(symbol, interval):
-    url = "{0}{1}?symbol={2}&interval={3}".format(Base_url, Klines, symbol, interval)
+def get_klines(symbol, interval, start_epoch_time = None, end_epoch_time = None):
+    if start_epoch_time is None or end_epoch_time is None:
+        url = "{0}{1}?symbol={2}&interval={3}".format(Base_url, Klines, symbol, interval)
+    else:
+        url = "{0}{1}?symbol={2}&interval={3}&startTime={4}&endTime={5}".format(Base_url, Klines, symbol, interval, start_epoch_time, end_epoch_time)
     print_info("Calling " + url)
     response = requests.get(url)
     print_info(response)

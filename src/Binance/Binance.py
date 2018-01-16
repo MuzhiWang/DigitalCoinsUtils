@@ -202,3 +202,7 @@ class Client_Settings(object):
 
 # t = get_server_time()
 # tt = get_compare_info("EVXBTC", "2m", t)
+
+# t = get_current_date(1)
+# print t
+# write_data(t)
