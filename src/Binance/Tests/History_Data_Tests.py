@@ -1,5 +1,8 @@
-from Binance.Binance import *
-from Binance.Provider import *
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from Provider import *
 from Test_Settings import *
 
 def get_test_data(symbol):
@@ -112,6 +115,11 @@ def test_main():
 
     print "Entire expectation: {0}, up count: {1}, down count: {2}".format(expectation, up_count, down_count)
 
+def test_symbol(symbol):
+    earn_rate = simulate_trading(symbol)
+    for earn in earn_rate:
+        print "Earn type: {0}, earn rate: {1}".format(earn[0], earn[3])
+
 # simulate_trading("ETHBTC")
 
 
@@ -123,4 +131,5 @@ def test_main():
 # simulate_trading("EOSBTC")
 
 
-test_main()
+# test_main()
+test_symbol("ZRXBTC")
