@@ -4,20 +4,22 @@ import requests
 import json
 from Utils import *
 
-Base_url = "https://api.binance.com/"
-Ping = "api/v1/ping"
-Time = "api/v1/time"
-Klines = "api/v1/klines"
-All_Prices = "api/v1/ticker/allPrices"
+BASE_URL = "https://api.binance.com/"
+PING = "api/v1/ping"
+TIME = "api/v1/time"
+KLINES = "api/v1/klines"
+ALL_PRICES = "api/v1/ticker/allPrices"
+DEPTH = "api/v1/depth"
+
 
 def ping():
-    url = Base_url + Ping
+    url = BASE_URL + PING
     print_info("Calling " + url)
     response = requests.get(url)
     print_info(response)
 
 def get_server_time():
-    url = Base_url + Time
+    url = BASE_URL + TIME
     print_info("Calling " + url)
     response = requests.get(url)
     print_info(response)
@@ -25,11 +27,22 @@ def get_server_time():
     serverTIme = json.loads(response.content)
     return serverTIme["serverTime"]
 
+def get_depth(symbol, limit = None):
+    url = "{0}{1}?symbol={2}".format(BASE_URL, DEPTH, symbol)
+    if limit is not None:
+        url += "&limit={0}".format(limit)
+    response = requests.get(url)
+    print_info(url)
+    content = response.content
+    _depth = json.loads(content)
+    print_info(_depth)
+    return Depth(_depth)
+
 def get_klines(symbol, interval, start_epoch_time = None, end_epoch_time = None):
     if start_epoch_time is None or end_epoch_time is None:
-        url = "{0}{1}?symbol={2}&interval={3}".format(Base_url, Klines, symbol, interval)
+        url = "{0}{1}?symbol={2}&interval={3}".format(BASE_URL, KLINES, symbol, interval)
     else:
-        url = "{0}{1}?symbol={2}&interval={3}&startTime={4}&endTime={5}".format(Base_url, Klines, symbol, interval, start_epoch_time, end_epoch_time)
+        url = "{0}{1}?symbol={2}&interval={3}&startTime={4}&endTime={5}".format(BASE_URL, KLINES, symbol, interval, start_epoch_time, end_epoch_time)
     print_info("Calling " + url)
     response = requests.get(url)
     print_info(response)
@@ -54,7 +67,7 @@ def get_all_symbols():
     return all_symbols
 
 def get_all_prices():
-    url = Base_url + All_Prices
+    url = BASE_URL + ALL_PRICES
     print_info("Calling " + url)
     response = requests.get(url)
     print_info(response)
@@ -156,6 +169,58 @@ class Line(object):
     def can_be_ignored(self):
         return self._can_be_ignored
 
+'''
+{
+  "lastUpdateId": 1027024,
+  "bids": [
+    [
+      "4.00000000",     // PRICE
+      "431.00000000",   // QTY
+      []                // Can be ignored
+    ]
+  ],
+  "asks": [
+    [
+      "4.00000200",
+      "12.00000000",
+      []
+    ]
+  ]
+}
+'''
+class Depth(object):
+    def __init__(self, data):
+        # print data["bids"]
+        bids = []
+        asks = []
+        for b in list(data["bids"]):
+            bids.append(Depth_Attr(b))
+        for a in list(data["asks"]):
+            asks.append(Depth_Attr(a))
+        self._bids = bids
+        self._asks = asks
+
+    @property
+    def bids(self):
+        return self._bids
+
+    @property
+    def asks(self):
+        return self._asks
+
+class Depth_Attr(object):
+    def __init__(self, data):
+        self._price = float(data[0])
+        self._qty = float(data[1])
+
+    @property
+    def price(self):
+        return self._price
+
+    @property
+    def qty(self):
+        return self._qty
+
 #
 # ping()
 #
@@ -168,3 +233,8 @@ class Line(object):
 # data = get_all_symbols()
 # print data
 # write_data(data)
+
+# t = get_depth("ETHBTC", 5)
+# for i in t.bids:
+#     print i.price
+#     print i.qty

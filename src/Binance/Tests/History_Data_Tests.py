@@ -67,7 +67,6 @@ def simulate_trading(symbol):
             # Fluctuation case:
             else:
                 fluctuation_count += 1
-                continue
             # else:
             #     print_error("Other case in buy already. Buy price: {0}, current price: {1}, index: {2}. With fluctuation count: {3} ".format(buy_price, current_price, index, fluctuation_count))
         else:
@@ -76,6 +75,8 @@ def simulate_trading(symbol):
                 buy_price = current_price
                 buy_count += 1
                 fluctuation_count = 0
+
+        # print data.close_time
 
     print "{0} Buy count: {1}, sell count: {2}".format(symbol, buy_count, sold_count)
     return earn_rate
@@ -104,7 +105,7 @@ def test_main():
     up_count = 0
     down_count = 0
 
-    for symbol in symbols[20:50]:
+    for symbol in symbols:
         earn_rate = simulate_trading(symbol)
         for earn in earn_rate:
             if earn[3] >= 0:

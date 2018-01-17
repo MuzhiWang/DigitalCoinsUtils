@@ -5,22 +5,22 @@ from Binance import *
 import threading
 
 def main(argv):
-   interval = None
-   try:
-      opts, args = getopt.getopt(argv,"hi:",["interval="])
-   except getopt.GetoptError:
-      print 'Cron_Job.py -i <interval>'
-      sys.exit(2)
-   for opt, arg in opts:
-      if opt == '-h':
-         print 'Cron_Job.py -i <interval=2m>'
-         sys.exit()
-      elif opt in ("-i", "--interval"):
-          interval = arg
-   print 'The interval is ', interval
+   # interval = None
+   # try:
+   #    opts, args = getopt.getopt(argv,"hi:",["interval="])
+   # except getopt.GetoptError:
+   #    print 'Cron_Job.py -i <interval>'
+   #    sys.exit(2)
+   # for opt, arg in opts:
+   #    if opt == '-h':
+   #       print 'Cron_Job.py -i <interval=2m>'
+   #       sys.exit()
+   #    elif opt in ("-i", "--interval"):
+   #        interval = arg
+   # print 'The interval is ', interval
 
    try:
-       parallel_run_job(interval)
+       parallel_run_job()
    # TODO: This still doesn't work. We need to kill the entire process once we use keyboard.
    except KeyboardInterrupt:
        exit()
@@ -29,14 +29,14 @@ def main(argv):
 def run_cron_job(symbols, interval):
    while 1:
       try:
-         check_symbols(symbols, interval)
+         check_symbols(symbols)
          time.sleep(CRON_JOB_TIME)
       except KeyboardInterrupt:
          raise
       except:
          print_error("Error happened in Cron job, retry...")
 
-def parallel_run_job(interval):
+def parallel_run_job():
     # create and start our threads
     threads = list()
     all_symbols = get_all_symbols()
@@ -52,7 +52,7 @@ def parallel_run_job(interval):
         print_info("Symbols in thread {0}: {1}, size {2}".format(i, symbols, len(symbols)))
         t = BinanceThread(i)
         t.symbols = symbols
-        t.interval = interval
+        t.interval = "1m"
         t.daemon = True
         threads.append(t)
         print_info('Starting Thread {}'.format(i))
