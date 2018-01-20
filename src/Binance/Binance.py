@@ -75,8 +75,8 @@ def check_depth(symbol):
             index = asks.index(a)
             asks_weight += ((1 - (float(index) / 20)) * a.qty)
 
-        print_info("The bids weight is: " + str(bids_weight))
-        print_info("The asks weight is: " + str(asks_weight))
+        print_info(("The bids weight is: " + str(bids_weight)))
+        print_info(("The asks weight is: " + str(asks_weight)))
 
         # depth_diff = float((bids_weight - asks_weight) / asks_weight)
         # print_info("The depth diff is: " + str(depth_diff))
@@ -87,7 +87,7 @@ def check_depth(symbol):
         time.sleep(DEFAULT_DEPTH_CHECK_INTERVAL)
 
     depth_diff = float((ave_bids_weight - ave_asks_weight) / ave_asks_weight)
-    print_info("The depth diff is: " + str(depth_diff))
+    print_info(("The depth diff is: " + str(depth_diff)))
 
     depth_comprare_info = Depth_Compare_Info()
     depth_comprare_info.symbol = symbol
@@ -128,14 +128,12 @@ def check_symbols(symbols):
                 depth_compare_info = check_depth(compare_info.symbol)
                 if depth_compare_info.diff_weight >= DEFAULT_DEPTH_DIFF:
                     print_info("{0} volume diff is: {1}".format(symbol, str(compare_info.diff_volume)))
-                    check_compare_info(symbol, interval, current_mill)
-
                     print_info("The {0} is increasing dramatically around: {1}. ".format(compare_info.symbol, get_current_time()), 1)
-                    print_info("The quote volume in 24 hours is: {0}".format(ticker_24hours_volume))
+                    print_info("The quote volume in 24 hours is: {0}".format(ticker_24hours_volume), 1)
                     print_info("The price at checking time is: {0}".format(compare_info.price), 1)
                     print_info("The price increase rate is: {0}".format(get_float_to_100_percent(compare_info.price_increase_rate)), 1)
                     print_info("The volume increase rate is: {0}".format(get_float_to_100_percent(compare_info.volume_increase_rate)), 1)
-                    print_info("The bids weight is: {0}, asks weight is: {1}, diff weight is: {3}".format(
+                    print_info("The bids weight is: {0}, asks weight is: {1}, diff weight is: {2}".format(
                         str(depth_compare_info.bids_weight), str(depth_compare_info.asks_weight),
                         get_float_to_100_percent(depth_compare_info.diff_weight)), 1)
                     print_info("*********************** GOOD LUCK! ************************\n", 1)
