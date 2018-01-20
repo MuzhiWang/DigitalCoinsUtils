@@ -57,30 +57,42 @@ def get_compare_info(symbol, interval, current_mill):
                 # print_error("Error occurred in symbol: {0}. ".format(symbol) + str(e))
 
 def check_depth(symbol):
-    depth = get_depth(symbol, limit=10)
-    bids = depth.bids
-    asks = depth.asks
-    bids_weight = 0.0
-    asks_weight = 0.0
-    count = len(bids)
 
-    for b in bids:
-        index = bids.index(b)
-        bids_weight += ((1 - (float(index) / 20)) * b.qty)
-    for a in asks:
-        index = asks.index(a)
-        asks_weight += ((1 - (float(index) / 20)) * a.qty)
+    ave_bids_weight = 0.0
+    ave_asks_weight = 0.0
+    for i in range(DEFAULT_DEPTH_CHECK_TIMES):
+        depth = get_depth(symbol, limit=10)
+        bids = depth.bids
+        asks = depth.asks
+        bids_weight = 0.0
+        asks_weight = 0.0
+        count = len(bids)
 
-    print_info("The bids weight is: " + str(bids_weight))
-    print_info("The asks weight is: " + str(asks_weight))
+        for b in bids:
+            index = bids.index(b)
+            bids_weight += ((1 - (float(index) / 20)) * b.qty)
+        for a in asks:
+            index = asks.index(a)
+            asks_weight += ((1 - (float(index) / 20)) * a.qty)
 
-    depth_diff = float((bids_weight - asks_weight) / asks_weight)
+        print_info("The bids weight is: " + str(bids_weight))
+        print_info("The asks weight is: " + str(asks_weight))
+
+        # depth_diff = float((bids_weight - asks_weight) / asks_weight)
+        # print_info("The depth diff is: " + str(depth_diff))
+
+        ave_bids_weight += bids_weight
+        ave_asks_weight += asks_weight
+
+        time.sleep(DEFAULT_DEPTH_CHECK_INTERVAL)
+
+    depth_diff = float((ave_bids_weight - ave_asks_weight) / ave_asks_weight)
     print_info("The depth diff is: " + str(depth_diff))
 
     depth_comprare_info = Depth_Compare_Info()
     depth_comprare_info.symbol = symbol
-    depth_comprare_info.asks_weight = asks_weight
-    depth_comprare_info.bids_weight = bids_weight
+    depth_comprare_info.asks_weight = ave_asks_weight / DEFAULT_DEPTH_CHECK_TIMES
+    depth_comprare_info.bids_weight = ave_bids_weight / DEFAULT_DEPTH_CHECK_TIMES
     depth_comprare_info.diff_weight = depth_diff
     return depth_comprare_info
 
@@ -295,6 +307,9 @@ class Client_Settings(object):
 # write_data(t)
 
 # depth_diff = check_depth("IOTABTC")
+# print depth_diff.asks_weight
+# print depth_diff.bids_weight
+# print depth_diff.diff_weight
 # t = (1- (float(0) / 20)) * 10.0
 # print_info(t)
 
