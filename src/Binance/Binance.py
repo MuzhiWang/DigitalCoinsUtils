@@ -85,10 +85,10 @@ def check_depth(symbol):
     return depth_comprare_info
 
 
-
 def check_all_symbols():
     symbols = get_all_symbols()
     check_symbols(symbols)
+
 
 def check_symbols(symbols):
     print_info("----------------------- Start check -----------------------")
@@ -104,20 +104,39 @@ def check_symbols(symbols):
         if count < 0:
             break
         print_info("This is check all symbols, the symbol is: {0}".format(symbol))
-        compare_info = get_compare_info(symbol, interval, current_mill)
 
-        if compare_info is None:
-            print_error("Empty compared info for symbol: {0}".format(symbol))
-            continue
+        ticker_24hours_volume = get_ticker_24hours(symbol)[0].quote_volume
+        print_info("{0} 24 hours quote volume: {1}".format(symbol, ticker_24hours_volume))
+        if ticker_24hours_volume >= QUOTA_VOLUME_THRESHOLD:
+            compare_info = get_compare_info(symbol, interval, current_mill)
+            if compare_info is None:
+                print_error("Empty compared info for symbol: {0}".format(symbol))
+                continue
+            if check_compare_info(compare_info):
+                depth_compare_info = check_depth(compare_info.symbol)
+                if depth_compare_info.diff_weight >= DEFAULT_DEPTH_DIFF:
+                    print_info("{0} volume diff is: {1}".format(symbol, str(compare_info.diff_volume)))
+                    check_compare_info(symbol, interval, current_mill)
 
-        print_info("{0} volume diff is: {1}".format(symbol, str(compare_info.diff_volume)))
-        compare_info_alert(compare_info)
+                    print_info("The {0} is increasing dramatically around: {1}. ".format(compare_info.symbol, get_current_time()), 1)
+                    print_info("The quote volume in 24 hours is: {0}".format(ticker_24hours_volume))
+                    print_info("The price at checking time is: {0}".format(compare_info.price), 1)
+                    print_info("The price increase rate is: {0}".format(get_float_to_100_percent(compare_info.price_increase_rate)), 1)
+                    print_info("The volume increase rate is: {0}".format(get_float_to_100_percent(compare_info.volume_increase_rate)), 1)
+                    print_info("The bids weight is: {0}, asks weight is: {1}, diff weight is: {3}".format(
+                        str(depth_compare_info.bids_weight), str(depth_compare_info.asks_weight),
+                        get_float_to_100_percent(depth_compare_info.diff_weight)), 1)
+                    print_info("*********************** GOOD LUCK! ************************\n", 1)
+
+
         time.sleep(SCAN_EACH_SYMBOL_DELAY)
         count += 1
 
     print_info("The check all symbols completed.")
 
-def compare_info_alert(compare_info, client_settings = None):
+
+def check_compare_info(compare_info, client_settings = None):
+
     print_info("This is compare info alert, the symbol is: {0}".format(compare_info.symbol))
     print_info(compare_info.price_increase_rate)
 
@@ -126,14 +145,10 @@ def compare_info_alert(compare_info, client_settings = None):
 
     if compare_info.price_increase_rate > client_settings.price_increase_rate_threshold:
         if compare_info.volume_increase_rate > client_settings.volume_increase_rate_threshold:
-            depth_compare_info = check_depth(compare_info.symbol)
-            if depth_compare_info.diff_weight >= DEFAULT_DEPTH_DIFF:
-                print_info("The {0} is increasing dramatically around: {1}. ".format(compare_info.symbol, get_current_time()), 1)
-                print_info("The price at checking time is: {0}".format(compare_info.price), 1)
-                print_info("The price increase rate is: {0}".format(get_float_to_100_percent(compare_info.price_increase_rate)), 1)
-                print_info("The volume increase rate is: {0}".format(get_float_to_100_percent(compare_info.volume_increase_rate)), 1)
-                print_info("The bids weight is: {0}, asks weight is: {1}, diff weight is: {3}".format(str(depth_compare_info.bids_weight), str(depth_compare_info.asks_weight), get_float_to_100_percent(depth_compare_info.diff_weight)), 1)
-                print_info("*********************** GOOD LUCK! ************************", 1)
+            return True
+
+    return False
+
 
 
 # Compare info class represents the difference we want to check from target Line value.
@@ -214,21 +229,21 @@ class Depth_Compare_Info(object):
         return self._bids_weight
     @bids_weight.setter
     def bids_weight(self, val):
-        self._bids_weight = val
+        self._bids_weight = float(val)
 
     @property
     def asks_weight(self):
         return self._asks_weight
     @asks_weight.setter
     def asks_weight(self, val):
-        self._asks_weight = val
+        self._asks_weight = float(val)
 
     @property
     def diff_weight(self):
         return self._diff_weight
     @diff_weight.setter
     def diff_weight(self, val):
-        self._diff_weight = val
+        self._diff_weight = float(val)
 
 # Client settings class override the default settings to check compare results, which will trigger alerts.
 class Client_Settings(object):
@@ -264,7 +279,7 @@ class Client_Settings(object):
 # print str(tt)
 
 
-check_all_symbols()
+# check_all_symbols()
 # check_symbols(["ZRXBTC"])
 
 # ttt = "abcdef"
@@ -282,3 +297,7 @@ check_all_symbols()
 # depth_diff = check_depth("IOTABTC")
 # t = (1- (float(0) / 20)) * 10.0
 # print_info(t)
+
+# symbol = "ZRXBTC"
+# ticker_24hours_volume = get_ticker_24hours(symbol)[0].quote_volume
+# print_info("{0} 24 hours quote volume: {1}".format(symbol, ticker_24hours_volume), 1)

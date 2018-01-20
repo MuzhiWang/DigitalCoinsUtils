@@ -10,6 +10,7 @@ TIME = "api/v1/time"
 KLINES = "api/v1/klines"
 ALL_PRICES = "api/v1/ticker/allPrices"
 DEPTH = "api/v1/depth"
+TICKER_24HOURS = "api/v1/ticker/24hr"
 
 
 def ping():
@@ -75,25 +76,48 @@ def get_all_prices():
     print_info(content)
     return json.loads(content)
 
+def get_ticker_24hours(symbol=None):
+    url = "{0}{1}".format(BASE_URL, TICKER_24HOURS)
+    if symbol is not None:
+        url = "{0}?&symbol={1}".format(url, symbol)
+    print_info("Call url: " + url)
+    response = requests.get(url)
+    print_info(response)
+    content = response.content
+    tickers = []
+
+    if symbol is None:
+        data = json.loads(content)
+        for d in data:
+            tickers.append(Ticker(d))
+    else:
+        data = json.loads(content)
+        tickers.append(Ticker(data))
+
+    return tickers
+
+
+
+
+'''
+[
+    [
+        1499040000000,      // Open time
+        "0.01634790",       // Open
+        "0.80000000",       // High
+        "0.01575800",       // Low
+        "0.01577100",       // Close
+        "148976.11427815",  // Volume
+        1499644799999,      // Close time
+        "2434.19055334",    // Quote asset volume
+        308,                // Number of trades
+        "1756.87402397",    // Taker buy base asset volume
+        "28.46694368",      // Taker buy quote asset volume
+        "17928899.62484339" // Can be ignored
+    ]
+]
+'''
 class Line(object):
-# '''
-# [
-#     [
-#         1499040000000,      // Open time
-#         "0.01634790",       // Open
-#         "0.80000000",       // High
-#         "0.01575800",       // Low
-#         "0.01577100",       // Close
-#         "148976.11427815",  // Volume
-#         1499644799999,      // Close time
-#         "2434.19055334",    // Quote asset volume
-#         308,                // Number of trades
-#         "1756.87402397",    // Taker buy base asset volume
-#         "28.46694368",      // Taker buy quote asset volume
-#         "17928899.62484339" // Can be ignored
-#     ]
-# ]
-# '''
     def __init__(self, data):
         self._open_time = data[0]
         self._open = data[1]
@@ -221,6 +245,45 @@ class Depth_Attr(object):
     def qty(self):
         return self._qty
 
+'''
+{
+    "symbol": "ZRXBTC",
+    "priceChange": "0.00001709",
+    "priceChangePercent": "11.934",
+    "weightedAvgPrice": "0.00015502",
+    "prevClosePrice": "0.00014321",
+    "lastPrice": "0.00016030",
+    "lastQty": "609.00000000",
+    "bidPrice": "0.00015958",
+    "bidQty": "88.00000000",
+    "askPrice": "0.00016030",
+    "askQty": "1266.00000000",
+    "openPrice": "0.00014321",
+    "highPrice": "0.00016440",
+    "lowPrice": "0.00014142",
+    "volume": "4419186.00000000",
+    "quoteVolume": "685.06295847",
+    "openTime": 1516335777202,
+    "closeTime": 1516422177202,
+    "firstId": 1026927,
+    "lastId": 1042796,
+    "count": 15870
+}
+'''
+class Ticker(object):
+    def __init__(self, data):
+        self._symbol = data["symbol"]
+        self._quote_volume = int(float(data["quoteVolume"]))
+
+    @property
+    def symbol(self):
+        return self._symbol
+
+    @property
+    def quote_volume(self):
+        return self._quote_volume
+
+
 #
 # ping()
 #
@@ -238,3 +301,7 @@ class Depth_Attr(object):
 # for i in t.bids:
 #     print i.price
 #     print i.qty
+
+# t = get_ticker_24hours("ZRXBTC")
+# print len(t)
+# print t[0].quote_volume

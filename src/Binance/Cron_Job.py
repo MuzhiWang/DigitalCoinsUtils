@@ -18,10 +18,9 @@ def main(argv):
    #    elif opt in ("-i", "--interval"):
    #        interval = arg
    # print 'The interval is ', interval
-
    try:
        parallel_run_job()
-   # TODO: This still doesn't work. We need to kill the entire process once we use keyboard.
+       # TODO: This still doesn't work. We need to kill the entire process once we use keyboard.
    except KeyboardInterrupt:
        exit()
 
@@ -34,9 +33,10 @@ def run_cron_job(symbols, interval):
       except KeyboardInterrupt:
          raise
       except:
-         print_error("Error happened in Cron job, retry...")
+         print_error("Error happened in Cron job, continue...")
 
 def parallel_run_job():
+    print_info("\nStart to run cron job to check all symbols... Gooood luck!\n", 1)
     # create and start our threads
     threads = list()
     all_symbols = get_all_symbols()
